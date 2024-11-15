@@ -27,77 +27,106 @@ listNode* AddRandomNode(listHead* h)
 {
 	listNode* newNode = (listNode*)malloc(sizeof(listNode));
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 9; i++) {
 		newNode->name[i] = RANGEN(26) + 'a';
-	newNode->name[9] = 0;
-	newNode->score = RANGEN(101);
-	newNode->link = NULL;
-	
-	/*
-	Á¦ÀÛµÈ Á¡¼ö¿Í ÀÌ¸§À» ±â¹ÝÀ¸·Î À§Ä¡¸¦ Ã£¾Æ¼­ newNode¸¦ »ðÀÔÇÏ¿©¶ó.
-	*/
-	// ¿©±âºÎÅÍ Áö¿ö¾ßÇÔ
-	if (h->head == NULL)
-		h->head = newNode;
-	else
-	{
-		newNode->link = h->head;
-		h->head = newNode;
+		newNode->name[9] = 0;
+		newNode->score = RANGEN(101);
+		newNode->link = NULL;
 	}
-	// ¿©±â ±îÁö
-
 
 	return newNode;
 }
 
 listNode* AddDirectNode(listHead* h, int s, char* n)
 {
-	listNode* newNode = (listNode*)malloc(sizeof(listNode));
+	listNode* tempNode = h->head;
+    listNode* newNode = (listNode*)malloc(sizeof(listNode));
+    strcpy(newNode->name, n);
+    newNode->score = s;
+    newNode->link = NULL;
+ 
+    // ë‚´ë¦¼ì°¨ìˆœ ì •ë ¬
+    if (h->type == 1) {  
+        // í—¤ë“œ ë…¸ë“œ ê²€ì‚¬
+        if (tempNode == NULL || tempNode->score < newNode->score ||
+            (tempNode->score == newNode->score && strcmp(tempNode->name, newNode->name) > 0)) {
+            newNode->link = tempNode;
+           	h->head = newNode;
+            return newNode;
+        }
+        
+        // í—¤ë“œ ë‹¤ìŒë¶€í„° ë¹„êµ
+        while (tempNode->link != NULL && tempNode->link->score > newNode->score) {
+            tempNode = tempNode->link;
+        }
+        
+        while (tempNode->link != NULL && tempNode->link->score == newNode->score && strcmp(tempNode->link->name, newNode->name) < 0) {
+            tempNode = tempNode->link;
+        }
 
-	strcpy(newNode->name, n);
-	newNode->score = s;
-	newNode->link = NULL;
+        newNode->link = tempNode->link;
+        tempNode->link = newNode;
 
-	/*
-	ÀÔ·ÂµÈ Á¡¼ö¿Í ÀÌ¸§À» ±â¹ÝÀ¸·Î À§Ä¡¸¦ Ã£¾Æ¼­ newNode¸¦ »ðÀÔÇÏ¿©¶ó.
-	*/
-	// ¿©±âºÎÅÍ Áö¿ö¾ßÇÔ
-	if (h->head == NULL)
-		h->head = newNode;
-	else
-	{
-		newNode->link = h->head;
-		h->head = newNode;
-	}
-	// ¿©±â ±îÁö
+    // ì˜¤ë¦„ì°¨ìˆœ ì •ë ¬
+    } else {  
+        // í—¤ë“œ ë…¸ë“œ ê²€ì‚¬
+        if (tempNode == NULL || tempNode->score > newNode->score ||
+            (tempNode->score == newNode->score && strcmp(tempNode->name, newNode->name) > 0)) {
+            newNode->link = tempNode;
+            h->head = newNode;
+            return newNode;
+        }
 
-	return newNode;
+        // í—¤ë“œ ë‹¤ìŒë¶€í„° ë¹„êµ
+        while (tempNode->link != NULL && tempNode->link->score < newNode->score) {
+            tempNode = tempNode->link;
+        }
+        
+        while (tempNode->link != NULL && tempNode->link->score == newNode->score && strcmp(tempNode->link->name, newNode->name) > 0) {
+            tempNode = tempNode->link;
+        }
+
+        newNode->link = tempNode->link;
+        tempNode->link = newNode;
+    }
+
+    return newNode;
 }
 
 listNode* DeleteSelectNode(listHead* h, char* n)
 {
-	listNode* oldNode = NULL; //»èÁ¦ÇÒ ³ëµåÀÇ À§Ä¡¸¦ ÀúÀå
-	
-	/*
-	¹®ÀÚ¿­ nÀ» ±â¹ÝÀ¸·Î »èÁ¦ÇÒ ³ëµå¸¦ Ã£¾Æ »èÁ¦ÇÏ°í
-	±× »èÁ¦ÇÒ ³ëµå¸¦ oldNode¿¡ ÀúÀå	
-	*/
-	return oldNode;
+    listNode* tempNode = h->head;
+
+    if (tempNode != NULL && strcmp(tempNode->name, n) == 0) {
+        h->head = tempNode->link;
+        return tempNode;
+    }
+
+    listNode* prevNode = tempNode;
+    while (tempNode != NULL && tempNode->link != NULL) {
+        if (strcmp(tempNode->link->name, n) == 0) {
+            listNode* remove = tempNode->link;
+            tempNode->link = tempNode->link->link;
+            return remove;
+        }
+        tempNode = tempNode->link;
+    }
+    return NULL; 
 }
 
 listNode* DeleteLastNode(listHead* h)
 {
-	listNode* oldNode = NULL; //»èÁ¦ÇÒ ³ëµåÀÇ À§Ä¡¸¦ ÀúÀå
+	listNode* oldNode = NULL; //ì‚­ì œí•  ë…¸ë“œì˜ ìœ„ì¹˜ë¥¼ ì €ìž¥
 	listNode* temp = h->head;
 
 	if (temp == NULL)
 	{
-		printf("»èÁ¦ÇÒ ³ëµå°¡ ¾ø½À´Ï´Ù.\n");
+		printf("ì‚­ì œí•  ë…¸ë“œê°€ ì—†ìŠµë‹ˆë‹¤.\n");
 		oldNode =  NULL;
 	}
 	else if( temp->link == NULL)
 	{
-		printf("³ëµå°¡ ¸ðµÎ »èÁ¦µÇ¾ú½À´Ï´Ù.\n");
+		printf("ë…¸ë“œê°€ ëª¨ë‘ ì‚­ì œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
 		oldNode = temp;
 		h->head = NULL;
 	}
@@ -116,101 +145,209 @@ listNode* DeleteLastNode(listHead* h)
 
 listNode* ChangeNode(listHead* h, int s, char* n)
 {
-	listNode* tempNode = NULL; //»èÁ¦ÇÒ ³ëµåÀÇ À§Ä¡¸¦ ÀúÀå
+	listNode* tempNode = h->head;
+	listNode* change = NULL; 
+	int isFound = 0;
+	if (tempNode == NULL) return NULL;
 
+	if (strcmp(tempNode->name, n) == 0) { // head change
+		change = tempNode;
+		h->head = tempNode->link;
 
-	return tempNode;
+		free(change);
+		return AddDirectNode(h, s, n); 
+	}
+
+	while (tempNode->link != NULL) {
+		if (strcmp(n, tempNode->link->name) == 0) {
+			isFound = 1;
+			break;
+		}
+
+		tempNode = tempNode->link;
+	}
+	
+	if (isFound == 1) {
+		change = tempNode->link;
+
+		tempNode->link = tempNode->link->link;
+
+		free(change);
+
+		return AddDirectNode(h, s, n);
+	} else {
+		return NULL;
+	}
 }
+
 listNode* FindbyName(listHead* h, char* n)
 {
-	listNode* tempNode = NULL; //»èÁ¦ÇÒ ³ëµåÀÇ À§Ä¡¸¦ ÀúÀå
+	listNode* tempNode = h->head;
+	
+	if (tempNode == NULL) return NULL;
 
+	while (tempNode != NULL) {
+		if (strcmp(tempNode->name, n) == 0) 
+			return tempNode;
 
-	return tempNode;
+		tempNode = tempNode->link;
+	}
 
+	return NULL;
 }
+
 listNode* FindbyScore(listHead* h, int s)
 {
-	listNode* tempNode = NULL; //»èÁ¦ÇÒ ³ëµåÀÇ À§Ä¡¸¦ ÀúÀå
+	listNode* tempNode = h->head; 
+	int isFound = 0;
 
+	if (tempNode == NULL) return NULL;
 
-	return tempNode;
+	if (h->type == 1) {
+		while (tempNode->link != NULL) {
+			if (tempNode->score == s) {
+				isFound = 1;
+				break;
+			}
+			tempNode = tempNode->link;
+		}
+
+		if (isFound == 0) return NULL;
+
+		while (tempNode->link != NULL && tempNode->link->score == s) {
+			tempNode = tempNode->link;
+		}
+
+		return tempNode;
+	} else {
+		while (tempNode->link != NULL) {
+			if (tempNode->score == s) {
+				isFound = 1;
+				break;
+			}
+			tempNode = tempNode->link;
+		}
+
+		if (isFound == 0) return NULL;
+
+		while (tempNode->link != NULL && tempNode->link->score == s) {
+			tempNode = tempNode->link;
+		}
+
+		return tempNode;		
+	}
+	
 }
+
 listNode* FindMiddleNode(listHead* h)
 {
-	listNode* tempNode = NULL; //»èÁ¦ÇÒ ³ëµåÀÇ À§Ä¡¸¦ ÀúÀå
+    listNode* slow = h->head; // ì¤‘ê°„ì— ë„ì°©í•  í¬ì¸í„° 
+    listNode* fast = h->head; // slowë³´ë‹¤ 2ë°° ë¹¨ë¦¬ ê°€ëŠ” í¬ì¸í„° 
 
+    if (slow == NULL) return NULL;
 
-	return tempNode;
+    while (fast != NULL && fast->link != NULL) {
+        slow = slow->link;           
+        fast = fast->link->link;     
+    }
+
+    return slow;
 }
+
 listNode* FindLastNode(listHead* h)
 {
 	listNode* tempNode = h->head;
 
-	if (tempNode == NULL)
-	{
-		printf("ÀúÀåµÈ µ¥ÀÌÅÍ°¡ ¾ø½À´Ï´Ù.\n");;
+	if (tempNode == NULL) {
+		return NULL;
 	}
-	else
-	{
-		while (tempNode->link != NULL)
-		{
-			tempNode = tempNode->link;
-		}
-	}
+
+	while (tempNode->link != NULL) tempNode = tempNode->link;
+
 	return tempNode;
 }
+
 double CalAverage(listHead* h)
 {
+	listNode* temp = h->head;
 	double ave = 0.0;
+	int sum = 0, nStu = 0;
 
-	if (h->head == NULL)		//³ëµå¿¡ ÇÏ³ªµµ ¾ø´Â °æ¿ì
+	if (h->head == NULL)		//ë…¸ë“œì— í•˜ë‚˜ë„ ì—†ëŠ” ê²½ìš°
 	{
 		return -1;
 	}
-	else						// ±× ¿ÜÀÇ °æ¿ì¿¡´Â ave ¿¡ Æò±Õ°ªÀÌ °è»êÇÏµµ·Ï ÇÏ¶ó.
+	else						// ê·¸ ì™¸ì˜ ê²½ìš°ì—ëŠ” ave ì— í‰ê· ê°’ì´ ê³„ì‚°í•˜ë„ë¡ í•˜ë¼.
 	{
-	
-	
-	
-	
+		while (temp != NULL) {
+			sum += temp->score;
+			temp = temp->link;
+			nStu++;
+		}
 	}
 
-
+	ave = (double)sum / nStu;
 
 	return ave;
 }
+
 void PrintAllNode(listHead* h)
 {
 	int count = 1;
 	listNode* temp;
-	printf("%4s %12s: %5s\n", "¼ø¼­", "ÀÌ¸§   ", "Á¡¼ö");
+	printf("%4s %12s: %5s\n", "ìˆœì„œ", "ì´ë¦„   ", "ì ìˆ˜");
 	DRAWSINGLELINE;
 	for (temp = h->head; temp != NULL; temp = temp->link)
-		printf("%3d. %12s: %3dÁ¡\n", count++, temp->name, temp->score);
+		printf("%3d. %12s: %3dì \n", count++, temp->name, temp->score);
 	
 }
 
 void PrintRangedNode(listHead* h, int min, int max)
 {
 	int count = 1;
-	listNode* temp;
-	printf("%4s %12s: %5s\n", "¼ø¼­", "ÀÌ¸§   ", "Á¡¼ö");
+	listNode* temp = h->head;
+	printf("%4s %12s: %5s\n", "ìˆœì„œ", "ì´ë¦„   ", "ì ìˆ˜");
 	DRAWSINGLELINE;
-	/*
-	 min ÀÌ»ó max ÀÌÇÏÀÇ °ªÀ» ¸ðµÎ Ãâ·ÂÇÏ´Â ºÎºÐ Ãß°¡
-	*/
-	// ¾Æ·¡ ºÎºÐ Áö¿ö¾ßÇÔ. ÇöÀç´Â ÀüÃ¼ Ãâ·ÂÀ¸·Î µÇ¾î ÀÖÀ½
-	for (temp = h->head; temp != NULL; temp = temp->link)
-		printf("%3d. %12s: %3dÁ¡\n", count++, temp->name, temp->score);
+
+    if (h->type == 0) { 
+        while (temp != NULL) {
+            if (temp->score > max) 
+                return;
+
+            if (temp->score >= min) {
+                printf("%4d %12s: %5d\n", count, temp->name, temp->score);
+                count++;
+            }
+            temp = temp->link; 
+        }
+    } else { 
+        while (temp != NULL) {
+            if (temp->score < min) 
+                return;
+
+            if (temp->score <= max) {
+                printf("%4d %12s: %5d\n", count, temp->name, temp->score);
+                count++;
+            }
+            temp = temp->link; 
+        }
+    }
 }
 
 void ReverseList(listHead* h)
 {
 	h->type = h->type == 0 ? 1 : 0;
-	/*
-	¿©±â¿¡´Â ¸®½ºÆ®¸¦ ¹ÝÀü½ÃÅ°´Â ³»¿ëÀÌ Ãß°¡µÇ¾î¾ß ÇÔ.
-	*/
+	listNode* r = NULL;
+	listNode* q = NULL;
+	listNode* p = h->head;
+
+	while (p != NULL) {
+		r = q;
+		q = p;
+		p = p->link;
+		
+		q->link = r;
+	}
+
+	h->head = q;
 }
-
-
